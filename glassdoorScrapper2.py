@@ -82,7 +82,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                 break
 
             job_button.click()  #You might 
-            time.sleep(1)
+            time.sleep(3)
             collected_successfully = False
             
             while not collected_successfully:
@@ -144,9 +144,19 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             
             try:
                 #driver.find_element_by_xpath('.//div[@class="tab" and @data-tab-type="overview"]').click()
-                driver.find_element_by_css_selector("div.css-lt549m.ef7s0la1").click()
+                companyTabs = driver.find_elements_by_css_selector("div.css-lt549m.ef7s0la1")
+                for t in companyTabs:
+                    if t.text == "Company":
+                        print("Company tab found")
+                        t.click()
+                        time.sleep(2)
+                    else:
+                        print("Company tab not found")
+            
                 print("SUCCESSSS>>>>>")
-                time.sleep(2)
+        
+                
+                
                 
                 try:
                     #<div class="infoEntity">
