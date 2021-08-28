@@ -30,6 +30,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
     #url = 'https://www.glassdoor.com/Job/jobs.htm?sc.keyword="' + keyword + '"&locT=C&locId=1147401&locKeyword=San%20Francisco,%20CA&jobType=all&fromAge=-1&minSalary=0&includeNoSalaryJobs=true&radius=100&cityId=-1&minRating=0.0&industryId=-1&sgocId=-1&seniorityType=all&companyId=-1&employerSizes=0&applicationType=0&remoteWorkType=0'
     driver.get(url)
     jobs = []
+    firstTimeSetUp = True
 
     while len(jobs) < num_jobs:  #If true, should be still looking for new jobs.
 
@@ -37,33 +38,45 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
         #Or, wait until the webpage is loaded, instead of hardcoding it.
         time.sleep(slp_time)
         
-        driver.find_element_by_id("onetrust-accept-btn-handler").click()
-        time.sleep(.4)
+        if firstTimeSetUp:
+            print("First Time SetUp")
+            try:
+                print("AcceptBtn")
+                driver.find_element_by_id("onetrust-accept-btn-handler").click()
+                print("Success")
+                time.sleep(.4)
+            except ElementClickInterceptedException:
+                print("Failed")
+                pass
 
-        #Test for the "Sign Up" prompt and get rid of it.
-        try:
-            #driver.find_element_by_class_name("selected").click()
-            driver.find_element_by_css_selector("a.css-l2wjgv.e1n63ojh0.jobLink").click()
-            
-        except ElementClickInterceptedException:
-            pass
+            #Test for the "Sign Up" prompt and get rid of it.
+            try:
+                #driver.find_element_by_class_name("selected").click()
+                driver.find_element_by_css_selector("a.css-l2wjgv.e1n63ojh0.jobLink").click()
+                
+            except ElementClickInterceptedException:
+                pass
 
-        time.sleep(.1)
-
-        try:
-            driver.find_element_by_css_selector('[alt="Close"]').click() #clicking to the X.
-            print(' x out worked')
-        except NoSuchElementException:
-            print(' x out failed')
-            pass
+            time.sleep(.1)
+    
+            try:
+                driver.find_element_by_css_selector('[alt="Close"]').click() #clicking to the X.
+                #print(' x out worked')
+            except NoSuchElementException:
+                #print(' x out failed')
+                pass
+        
+        else:
+             print("Not First Time SetUp")
 
         try:
             #jblist = driver.find_elements_by_class_name("hover.p-0.css-7ry9k1.exy0tjh5")
             element = driver.find_element_by_id("MainCol")
-            job_buttons = element.find_elements_by_tag_name("li")
-            print("jblist.Count = {}",len(job_buttons))
+            item = element.find_element_by_class_name("hover.p-0.css-7ry9k1.exy0tjh5")
+            job_buttons = item.find_elements_by_tag_name("li")
+            print("job_buttons.Count = {}",len(job_buttons))
         except NoSuchElementException:
-            print('Failed Listing1')
+            #print('Failed Listing1')
             pass
         
         
@@ -86,34 +99,56 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             collected_successfully = False
             
             while not collected_successfully:
+                
                 try:
                     print("While loop successed")
                     #company_name = job_button.find_element_by_xpath('.//*[@id="MainCol"]/div[1]/ul/li[1]/div[2]/div[1]/a/span"]').text # //*[@id="MainCol"]/div[1]/ul/li[1]/div[2]/div[1]/a/span
                     company_name = job_button.find_element_by_css_selector("a.css-l2wjgv.e1n63ojh0.jobLink").text
                     print(f"company_name = {company_name}")
-                    location = job_button.find_element_by_class_name("pr-xxsm.css-1ndif2q.e1rrn5ka0").text
-                    print(f"location = {location}")
-                    job_title = job_button.find_element_by_css_selector("a.jobLink.css-1rd3saf.eigr9kq2").text
-                    print(f"job_title = {job_title}")
-                    job_description = driver.find_element_by_class_name("jobDescriptionContent.desc").text
-                    print(f"job_description = {job_description}")
-                    # print("company_name = {}",company_name)
-                    # location = driver.find_element_by_xpath('.//div[@class="location"]').text
-                    # job_title = driver.find_element_by_xpath('.//div[contains(@class, "title")]').text
-                    # job_description = driver.find_element_by_xpath('.//div[@class="jobDescriptionContent desc"]').text
+                    
                     collected_successfully = True
                 except:
                     print("While loop failed")
-                    time.sleep(5)
+                    #time.sleep(5)
+                
+                try:
+                    
+                    if firstTimeSetUp :
+                        location = job_button.find_element_by_class_name("pr-xxsm.css-1ndif2q.e1rrn5ka0").text
+                    else:
+                        location = job_button.find_element_by_class_name("css-nq3w9f.pr-xxsm.css-iii9i8.e1rrn5ka0").text
+                 
+                    collected_successfully = True
+                except:
+                    print("While loop failed")
+                    #time.sleep(5)
 
+                try:
+                    
+                    job_title = job_button.find_element_by_css_selector("a.jobLink.css-1rd3saf.eigr9kq2").text
+                    print(f"job_title = {job_title}")
+                    
+                    collected_successfully = True
+                except:
+                    print("While loop failed")
+                    #time.sleep(5)
+                    
+                try:
+                    
+                    job_description = driver.find_element_by_class_name("jobDescriptionContent.desc").text
+                    print(f"job_description = {job_description}")
+                    
+                    collected_successfully = True
+                except:
+                    print("While loop failed")
+                    #time.sleep(5)
+        
+            
             try:
-                #salary_estimate = driver.find_element_by_xpath('.//span[@class="gray salary"]').text css-56kyx5 css-16kxj2j e1wijj242
-                print("salary tried and ")
-                #salary_estimate = driver.find_element_by_css_selector('s.css-56kyx5.css-16kxj2j.e1wijj242').text
-                #salary_estimate = driver.find_element_by_xpath('.//*[@id="JDCol"]/div/article/div/div[1]/div/div/div[1]/div[3]/div[1]/div[4]/span/text()').text
+                
                 salary_estimate = driver.find_element_by_class_name("css-56kyx5.css-16kxj2j.e1wijj242").text
-                print(f"salary_estimate = {salary_estimate}")
-                print("..succeeded ")
+                #print(f"salary_estimate = {salary_estimate}")
+                #print("..succeeded ")
             except NoSuchElementException:
                 print("..failed ")
                 salary_estimate = -1 #You need to set a "not found value. It's important."
@@ -121,10 +156,10 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             try:
                 #rating = driver.find_element_by_xpath('.//span[@class="rating"]').text
                 rating = driver.find_element_by_class_name("css-1m5m32b.e1tk4kwz2").text
-                print(f"rating = {rating}")
-                print("..succeeded ")
+                #print(f"rating = {rating}")
+                #print("..succeeded ")
             except NoSuchElementException:
-                print("..failed ")
+                #print("..failed ")
                 rating = -1 #You need to set a "not found value. It's important."
 
             #Printing for debugging
@@ -147,13 +182,14 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                 companyTabs = driver.find_elements_by_css_selector("div.css-lt549m.ef7s0la1")
                 for t in companyTabs:
                     if t.text == "Company":
-                        print("Company tab found")
+                        #print("Company tab found")
                         t.click()
                         time.sleep(2)
+                        break
                     else:
-                        print("Company tab not found")
+                        continue
             
-                print("SUCCESSSS>>>>>")
+                #print("SUCCESSSS>>>>>")
         
                 
                 
@@ -164,25 +200,25 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     #    <span class="value">San Francisco, CA</span>
                     #</div>
                     headquarters = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Headquarters"]//following-sibling::*').text
-                    print(f"headquarters = {headquarters}")
+                    #print(f"headquarters = {headquarters}")
                 except NoSuchElementException:
-                    print("Failed-headquarters")
+                    #print("Failed-headquarters")
                     headquarters = -1
 
                 try:
                     #size = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Size"]//following-sibling::*').text
                     size = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                    print(f"size = {size}")
+                    #print(f"size = {size}")
                 except NoSuchElementException:
-                    print("Failed-size")
+                    #print("Failed-size")
                     size = -1
 
                 try:
                     #founded = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Founded"]//following-sibling::*').text
                     founded = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                    print(f"founded = {founded}")
+                    #print(f"founded = {founded}")
                 except NoSuchElementException:
-                    print("Failed-founded")
+                    #print("Failed-founded")
                     founded = -1
 
                 try:
@@ -248,13 +284,17 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             "Revenue" : revenue,
             "Competitors" : competitors})
             #add job to jobs
+            print("FOR LOOP ENDED")
             
-            
+        print("TO NEXT PAGE")
         #Clicking on the "next page" button
         try:
             #driver.find_element_by_xpath('.//li[@class="next"]//a').click() //*[@id="FooterPageNav"]/div/ul/li[7]/a
             #driver.find_element_by_xpath('.//*[@id="FooterPageNav"]/div/ul/li[7]/a').click()
+            # driver.find_elements_by_css_selector("span.SVGInline").click()
             driver.find_element_by_class_name("css-114lpwu.e1gri00l4").click()
+            print("Next Button SUCCESS")
+            firstTimeSetUp = False
         except NoSuchElementException:
             print("Scraping terminated before reaching target number of jobs. Needed {}, got {}.".format(num_jobs, len(jobs)))
             break
