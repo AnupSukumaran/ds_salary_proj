@@ -31,6 +31,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
     driver.get(url)
     jobs = []
     firstTimeSetUp = True
+    pageItemCount = 0
 
     while len(jobs) < num_jobs:  #If true, should be still looking for new jobs.
 
@@ -109,6 +110,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     collected_successfully = True
                 except:
                     print("While loop failed")
+                    company_name = -1
                     #time.sleep(5)
                 
                 try:
@@ -121,6 +123,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     collected_successfully = True
                 except:
                     print("While loop failed")
+                    location = -1
                     #time.sleep(5)
 
                 try:
@@ -131,6 +134,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     collected_successfully = True
                 except:
                     print("While loop failed")
+                    job_title = -1
                     #time.sleep(5)
                     
                 try:
@@ -141,6 +145,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     collected_successfully = True
                 except:
                     print("While loop failed")
+                    job_description = -1
                     #time.sleep(5)
         
             
@@ -180,6 +185,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             try:
                 #driver.find_element_by_xpath('.//div[@class="tab" and @data-tab-type="overview"]').click()
                 companyTabs = driver.find_elements_by_css_selector("div.css-lt549m.ef7s0la1")
+                print("😎companyTabs Found")
                 for t in companyTabs:
                     if t.text == "Company":
                         #print("Company tab found")
@@ -189,65 +195,71 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                     else:
                         continue
             
-                #print("SUCCESSSS>>>>>")
+                print("SUCCESSSS>>>>>")
         
-                
-                
-                
                 try:
-                    #<div class="infoEntity">
-                    #    <label>Headquarters</label>
-                    #    <span class="value">San Francisco, CA</span>
-                    #</div>
-                    headquarters = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Headquarters"]//following-sibling::*').text
-                    #print(f"headquarters = {headquarters}")
-                except NoSuchElementException:
-                    #print("Failed-headquarters")
-                    headquarters = -1
-
-                try:
-                    #size = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Size"]//following-sibling::*').text
-                    size = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                    #print(f"size = {size}")
-                except NoSuchElementException:
-                    #print("Failed-size")
+                    print("Finding Attributes😖")
+                    attr = driver.find_elements_by_class_name("css-1taruhi.e1pvx6aw1")
+                    print(f"attr.len = {len(attr)}")
+                    attr_val = driver.find_elements_by_class_name("css-i9gxme.e1pvx6aw2")
+                    
                     size = -1
-
-                try:
-                    #founded = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Founded"]//following-sibling::*').text
-                    founded = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                    #print(f"founded = {founded}")
-                except NoSuchElementException:
-                    #print("Failed-founded")
                     founded = -1
-
-                try:
-                    type_of_ownership = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                except NoSuchElementException:
                     type_of_ownership = -1
-
-                try:
-                    industry = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                except NoSuchElementException:
                     industry = -1
-
-                try:
-                    sector = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                except NoSuchElementException:
                     sector = -1
-
-                try:
-                    revenue = driver.find_element_by_class_name("css-i9gxme.e1pvx6aw2").text
-                except NoSuchElementException:
                     revenue = -1
-
-                try:
-                    competitors = driver.find_element_by_xpath('.//div[@class="infoEntity"]//label[text()="Competitors"]//following-sibling::*').text
-                except NoSuchElementException:
                     competitors = -1
+                    headquarters = -1
+                    
+                    for i, v in enumerate(attr):
+                        print(f"Attrs = {v.text}")
+                        if v.text == "Size":
+                            print("😇Size found")
+                            size = attr_val[i].text
+                        # else:
+                        #     print("🥵Size found")
+                        #     size = -1
+                        
+                        if v.text == "Founded":
+                            founded = attr_val[i].text
+                        # else:
+                        #     founded = -1
+                            
+                        if v.text == "Type":
+                            type_of_ownership = attr_val[i].text
+                        # else:
+                        #     type_of_ownership = -1
+                            
+                        if v.text == "Industry":
+                            industry = attr_val[i].text
+                        # else:
+                        #     industry = -1
+                            
+                        if v.text == "Sector":
+                            sector = attr_val[i].text
+                        # else:
+                        #     sector = -1
+                            
+                        if v.text == "Revenue":
+                            revenue = attr_val[i].text
+                        # else:
+                        #     revenue = -1
+                            
+                        if v.text == "Competitors":
+                            competitors = attr_val[i].text
+                        # else:
+                        #     competitors = -1
+                        if v.text == "Headquarters":
+                            headquarters = attr_val[i].text
+                
+                except NoSuchElementException:
+                    print("🥶Failed")
+                    
+                    
 
             except NoSuchElementException:  #Rarely, some job postings do not have the "Company" tab.
-                print("FAILEDD>>>>>")
+                print("😶‍🌫️FAILEDD>>>>>")
                 headquarters = -1
                 size = -1
                 founded = -1
@@ -269,6 +281,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
                 print("Competitors: {}".format(competitors))
                 print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
+            print("🤬Size ERROR")
             jobs.append({"Job Title" : job_title,
             "Salary Estimate" : salary_estimate,
             "Job Description" : job_description,
@@ -284,19 +297,29 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_time):
             "Revenue" : revenue,
             "Competitors" : competitors})
             #add job to jobs
+            pageItemCount += 1
+            print(f"🤪pageItemCount = {pageItemCount}")
             print("FOR LOOP ENDED")
             
-        print("TO NEXT PAGE")
+        if pageItemCount != len(job_buttons):
+            print("😫No Next page")
+            break
+        
+        print("😍TO NEXT PAGE")
         #Clicking on the "next page" button
         try:
             #driver.find_element_by_xpath('.//li[@class="next"]//a').click() //*[@id="FooterPageNav"]/div/ul/li[7]/a
             #driver.find_element_by_xpath('.//*[@id="FooterPageNav"]/div/ul/li[7]/a').click()
-            # driver.find_elements_by_css_selector("span.SVGInline").click()
+            #driver.find_elements_by_css_selector("span.SVGInline").click()
             driver.find_element_by_class_name("css-114lpwu.e1gri00l4").click()
             print("Next Button SUCCESS")
+            pageItemCount = 0
+            print("😫PAGE COUNT RESETTED")
             firstTimeSetUp = False
         except NoSuchElementException:
             print("Scraping terminated before reaching target number of jobs. Needed {}, got {}.".format(num_jobs, len(jobs)))
+            pageItemCount = 0
+            print("😫PAGE COUNT RESETTED")
             break
 
     return pd.DataFrame(jobs)  #This line converts the dictionary object into a pandas DataFrame.
