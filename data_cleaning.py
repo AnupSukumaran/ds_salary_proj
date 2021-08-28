@@ -65,5 +65,26 @@ df['same_state'] = df.apply(lambda x: 1 if x.Location == x.Headquarters else 0, 
 
 
 #age
-df['age'] = df.apply(lambda x: x if x.FOund)
+df['age'] = df.Founded.apply(lambda x: x if x < 1 else 2021 - x)
 
+df['python_yn'] = df['Job Description'].apply(lambda x: 1 if 'python' in x.lower() else 0)
+
+test = df.python_yn.value_counts()
+
+df['R_yn'] = df['Job Description'].apply(lambda x: 1 if 'r studio' in x.lower() or 'r-studio' in x.lower() else 0)
+
+test2 = df.R_yn.value_counts()
+
+df['spark'] = df['Job Description'].apply(lambda x: 1 if 'spark' in x.lower() else 0)
+
+test3 = df.spark.value_counts()
+
+df['aws'] = df['Job Description'].apply(lambda x: 1 if 'aws' in x.lower() else 0)
+
+test4 = df.aws.value_counts()
+
+df['excel'] = df['Job Description'].apply(lambda x: 1 if 'excel' in x.lower() else 0)
+
+test5 = df.excel.value_counts()
+
+df.to_csv("salart_data_cleaned.csv", index = False)
